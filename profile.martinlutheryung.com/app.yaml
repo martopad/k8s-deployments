@@ -1,0 +1,56 @@
+# Glusterfs integration with kubernetes has been removed.
+# As a workaround, worker nodes needs to mount the html folder
+# then that will be volume mounted by the containers.
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: profilemly
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: profilemly
+  labels:
+    app: profilemly
+    service: profilemly
+spec:
+  selector:
+    app: profilemly
+  ports:
+    - protocol: TCP
+      port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: profilemly-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: profilemly
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: profilemly
+        version: v1
+    spec:
+      serviceAccountName: profilemly
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+      - name: profilemly
+        image: nginx:stable-alpine-perl
+        ports:
+        - containerPort: 80
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html
+            name: website-source
+            readOnly: true
+      volumes:
+      - name: website-source
+        hostPath:
+          path: '/mnt/gv0/production/websites/profile.martinlutheryung.com/html'
+          type: Directory
