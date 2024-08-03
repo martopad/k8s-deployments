@@ -4,7 +4,7 @@ metadata:
   name: profilemly-gateway
 spec:
   selector:
-    istio: ingressgateway
+    istio: ingressgateway-profile
   servers:
   - port:
       number: 80
