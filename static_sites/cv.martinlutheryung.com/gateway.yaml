@@ -1,27 +1,27 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: profilemly-gateway
+  name: cvmly-gateway
 spec:
   selector:
-    app: istio-ingressgateway-profile
+    app: istio-ingressgateway-cv
   servers:
   - port:
       number: 80
       name: http
       protocol: HTTP
     hosts:
-    - "profile.martinlutheryung.com"
+    - "cv.martinlutheryung.com"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: profilemly
+  name: cvmly
 spec:
   hosts:
-  - "profile.martinlutheryung.com"
+  - "cv.martinlutheryung.com"
   gateways:
-  - profilemly-gateway
+  - cvmly-gateway
   http:
   - match:
     - uri:
@@ -30,4 +30,4 @@ spec:
     - destination:
         port:
           number: 80
-        host: profilemly
+        host: cvmly

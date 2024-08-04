@@ -25,17 +25,93 @@ spec:
       enabled: true
     # Istio Gateway feature
     ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
     - name: istio-ingressgateway-profile
       enabled: true
       k8s:
         serviceAnnotations:
           metallb.universe.tf/address-pool:  ipprofilemly
+        overlays: # This object will modify default properties of the component
+            - kind: HorizontalPodAutoscaler
+              name: istio-ingressgateway-profile
+              patches:
+                - path: metadata.labels.app
+                  value: istio-ingressgateway-profile
+                - path: metadata.labels.istio
+                  value: ingressgateway-profile
+                - path: spec.scaleTargetRef.name
+                  value: istio-ingressgateway-profile
+            - kind: Deployment
+              name: istio-ingressgateway-profile
+              patches:
+                - path: metadata.labels.app
+                  value: istio-ingressgateway-profile  # Change the label to istio-ingressgateway-profile
+                - path: metadata.labels.istio
+                  value: ingressgateway-profile
+                - path: spec.selector.matchLabels.app
+                  value: istio-ingressgateway-profile
+                - path: spec.selector.matchLabels.istio
+                  value: ingressgateway-profile
+                - path: spec.template.metadata.labels.app
+                  value: istio-ingressgateway-profile
+                - path: spec.template.metadata.labels.istio
+                  value: ingressgateway-profile
+            - kind: Service
+              name: istio-ingressgateway-profile
+              patches:
+                - path: metadata.labels.app
+                  value: istio-ingressgateway-profile
+                - path: metadata.labels.istio
+                  value: ingressgateway-profile
+                - path: spec.selector.app
+                  value: istio-ingressgateway-profile
+                - path: spec.selector.istio
+                  value: ingressgateway-profile
     - name: istio-ingressgateway-cv
       enabled: true
       k8s:
         serviceAnnotations:
           metallb.universe.tf/address-pool:  ipcvmly
+        overlays: # This object will modify default properties of the component
+            - kind: HorizontalPodAutoscaler
+              name: istio-ingressgateway-cv
+              patches:
+                - path: metadata.labels.app
+                  value: istio-ingressgateway-cv
+                - path: metadata.labels.istio
+                  value: ingressgateway-cv
+                - path: spec.scaleTargetRef.name
+                  value: istio-ingressgateway-cv
+            - kind: Deployment
+              name: istio-ingressgateway-cv
+              patches:
+                - path: metadata.labels.app
+                  value: istio-ingressgateway-cv  # Change the label to istio-ingressgateway-cv
+                - path: metadata.labels.istio
+                  value: ingressgateway-cv
+                - path: spec.selector.matchLabels.app
+                  value: istio-ingressgateway-cv
+                - path: spec.selector.matchLabels.istio
+                  value: ingressgateway-cv
+                - path: spec.template.metadata.labels.app
+                  value: istio-ingressgateway-cv
+                - path: spec.template.metadata.labels.istio
+                  value: ingressgateway-cv
+            - kind: Service
+              name: istio-ingressgateway-cv
+              patches:
+                - path: metadata.labels.app
+                  value: istio-ingressgateway-cv
+                - path: metadata.labels.istio
+                  value: ingressgateway-cv
+                - path: spec.selector.app
+                  value: istio-ingressgateway-cv
+                - path: spec.selector.istio
+                  value: ingressgateway-cv
     egressGateways:
+    - name: istio-egressgateway
+      enabled: false
     - name: istio-egressgateway-profile
       enabled: false
     - name: istio-egressgateway-cv
@@ -49,5 +125,5 @@ spec:
       istioNamespace: istio-system
       configValidation: true
     gateways:
-      istio-egressgateway: {}
+      istio-ingressgateway: {}
       istio-egressgateway: {}
